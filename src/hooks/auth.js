@@ -99,11 +99,6 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
         window.location.pathname = '/login'
     }
     useEffect(() => {
-        console.log('middleware:', middleware);
-        console.log('redirectIfAuthenticated:', redirectIfAuthenticated);
-        console.log('user:', user);
-        console.log('error:', error);
-        
         if (middleware === 'guest' && redirectIfAuthenticated && user)
             router.push(redirectIfAuthenticated)
     

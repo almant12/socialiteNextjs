@@ -10,6 +10,7 @@ const ChatComponent = () => {
 
     // Function to update the userId from Sidebar
     const handleUserSelect = (id) => {
+        console.log(id)
         setUserId(id);
     };
     
@@ -20,7 +21,7 @@ const ChatComponent = () => {
                 <Box sx={{ p: 3, backgroundColor: 'white', borderBottom: 1, borderColor: 'grey.200' }}>
                     <Grid container sx={{ height: '100%', overflow: 'hidden' }}>
                         {/* Sidebar */}
-                        <Sidebar />
+                        <Sidebar onUserSelect={handleUserSelect}/>
                         {/* Chat Content */}
                         <ChatContent />
                     </Grid>

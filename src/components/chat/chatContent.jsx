@@ -1,9 +1,11 @@
-// ChatContent.jsx
+'use client'
 import React from 'react';
 import { Box, Grid, Paper, Divider, TextField, Button, Avatar } from '@mui/material';
 
-const ChatContent = () => (
-    <Grid item xs={9} sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
+const ChatContent = () => {
+
+    return (
+        <Grid item xs={9} sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
         <Box 
             sx={{ 
                 flexGrow: 1, 
@@ -60,6 +62,7 @@ const ChatContent = () => (
             </Box>
         </Box>
     </Grid>
-);
+    )
+};
 
 export default ChatContent;
