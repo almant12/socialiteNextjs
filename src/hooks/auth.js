@@ -1,13 +1,22 @@
-import useSWR from 'swr';
+
 import axios from '@/lib/axios';
-import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
+import { useState ,useEffect} from 'react';
 
 export const useAuth = () => {
-
     const router = useRouter();
     const params = useParams();
+
+    const [user,setUser] = useState(null)
+
+    useEffect(() => {
+        const storedUser = Cookies.get('user');
+        if (storedUser) {
+            console.log(storedUser)
+            setUser(JSON.parse(storedUser));
+        }
+    }, []);
 
     const csrf = () => axios.get('/sanctum/csrf-cookie');
 
@@ -18,8 +27,8 @@ export const useAuth = () => {
         axios
             .post('/api/register', props)
             .then(() => {
-                // Optionally, you can set the user directly after registration if the API returns it.
-                // setUser(response.data.user);
+                // Redirect to login page after successful registration
+                router.push('/login');
             })
             .catch(error => {
                 if (error.response.status !== 422) throw error;
@@ -32,13 +41,15 @@ export const useAuth = () => {
         setErrors([]);
         setStatus(null);
 
-        axios
+        await axios
             .post('/api/login', props)
             .then((response) => {
+                console.log(response.data)
                 // Assuming the response contains user and token
-                const { user: loggedInUser, token } = response.data;
+                const { user, token } = response.data;
+                setUser(user)
 
-                Cookies.set('user', JSON.stringify(loggedInUser), { expires: 7 }); // Save user in cookie
+                Cookies.set('user', JSON.stringify(user), { expires: 7 }); // Save user in cookie
                 Cookies.set('token', token, { expires: 7 }); // Save token in cookie
 
                 router.push('/dashboard'); // Redirect to dashboard or any other route
@@ -97,7 +108,6 @@ export const useAuth = () => {
 
     const logout = async () => {
         await axios.post('/api/logout').then(() => {
-            setUser(null); // Clear user on logout
             Cookies.remove('user'); // Remove user from cookie
             Cookies.remove('token'); // Remove token from cookie
         });
@@ -106,6 +116,7 @@ export const useAuth = () => {
     };
 
     return {
+        user,
         register,
         login,
         forgotPassword,

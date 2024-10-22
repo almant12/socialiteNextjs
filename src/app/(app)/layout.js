@@ -8,6 +8,7 @@ const AppLayout = ({ children }) => {
     const { user } = useAuth()
 
     if (!user) {
+        console.log(user)
         return <Loading />
     }
 
