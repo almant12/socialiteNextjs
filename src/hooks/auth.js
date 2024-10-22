@@ -1,77 +1,82 @@
-import useSWR from 'swr'
-import axios from '@/lib/axios'
-import { useEffect } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import useSWR from 'swr';
+import axios from '@/lib/axios';
+import { useEffect, useState } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import Cookies from 'js-cookie';
 
-export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
-    const router = useRouter()
-    const params = useParams()
+export const useAuth = () => {
 
-    const { data: user, error, mutate } = useSWR('/api/user', () =>
-        axios
-            .get('/api/user')
-            .then(res => res.data)
-            .catch(error => {
-                if (error.response.status !== 409) throw error
+    const router = useRouter();
+    const params = useParams();
 
-                router.push('/verify-email')
-            }),
-    )
-
-    const csrf = () => axios.get('/sanctum/csrf-cookie')
+    const csrf = () => axios.get('/sanctum/csrf-cookie');
 
     const register = async ({ setErrors, ...props }) => {
-        await csrf()
-
-        setErrors([])
+        await csrf();
+        setErrors([]);
 
         axios
             .post('/api/register', props)
-            .then(() => mutate())
-            .catch(error => {
-                if (error.response.status !== 422) throw error
-
-                setErrors(error.response.data.errors)
+            .then(() => {
+                // Optionally, you can set the user directly after registration if the API returns it.
+                // setUser(response.data.user);
             })
-    }
+            .catch(error => {
+                if (error.response.status !== 422) throw error;
+                setErrors(error.response.data.errors);
+            });
+    };
 
     const login = async ({ setErrors, setStatus, ...props }) => {
-        await csrf()
-
-        setErrors([])
-        setStatus(null)
+        await csrf();
+        setErrors([]);
+        setStatus(null);
 
         axios
             .post('/api/login', props)
-            .then(() => mutate())
-            .catch(error => {
-                if (error.response.status !== 422) throw error
+            .then((response) => {
+                // Assuming the response contains user and token
+                const { user: loggedInUser, token } = response.data;
 
-                setErrors(error.response.data.errors)
+                Cookies.set('user', JSON.stringify(loggedInUser), { expires: 7 }); // Save user in cookie
+                Cookies.set('token', token, { expires: 7 }); // Save token in cookie
+
+                router.push('/dashboard'); // Redirect to dashboard or any other route
             })
-    }
+            .catch(error => {
+                if (error.response.status !== 422) throw error;
+                setErrors(error.response.data.errors);
+            });
+    };
+
+    const githubLogin = async ({ setErrors, setStatus }) => {
+        await csrf();
+        setStatus(null);
+        setErrors([]);
+
+        axios.get("/api/github").then((res) => {
+            router.replace(res.data);
+        });
+    };
 
     const forgotPassword = async ({ setErrors, setStatus, email }) => {
-        await csrf()
-
-        setErrors([])
-        setStatus(null)
+        await csrf();
+        setErrors([]);
+        setStatus(null);
 
         axios
             .post('/api/forgot-password', { email })
             .then(response => setStatus(response.data.status))
             .catch(error => {
-                if (error.response.status !== 422) throw error
-
-                setErrors(error.response.data.errors)
-            })
-    }
+                if (error.response.status !== 422) throw error;
+                setErrors(error.response.data.errors);
+            });
+    };
 
     const resetPassword = async ({ setErrors, setStatus, ...props }) => {
-        await csrf()
-
-        setErrors([])
-        setStatus(null)
+        await csrf();
+        setErrors([]);
+        setStatus(null);
 
         axios
             .post('/api/reset-password', { token: params.token, ...props })
@@ -79,48 +84,34 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
                 router.push('/login?reset=' + btoa(response.data.status)),
             )
             .catch(error => {
-                if (error.response.status !== 422) throw error
-
-                setErrors(error.response.data.errors)
-            })
-    }
+                if (error.response.status !== 422) throw error;
+                setErrors(error.response.data.errors);
+            });
+    };
 
     const resendEmailVerification = ({ setStatus }) => {
         axios
             .post('/api/email/verification-notification')
-            .then(response => setStatus(response.data.status))
-    }
+            .then(response => setStatus(response.data.status));
+    };
 
     const logout = async () => {
-        if (!error) {
-            await axios.post('/api/logout').then(() => mutate())
-        }
+        await axios.post('/api/logout').then(() => {
+            setUser(null); // Clear user on logout
+            Cookies.remove('user'); // Remove user from cookie
+            Cookies.remove('token'); // Remove token from cookie
+        });
 
-        window.location.pathname = '/login'
-    }
-    useEffect(() => {
-        if (middleware === 'guest' && redirectIfAuthenticated && user)
-            router.push(redirectIfAuthenticated)
-    
-        if (middleware === 'auth' && !user?.email_verified_at)
-            router.push('/verify-email')
-        
-        if (
-            window.location.pathname === '/verify-email' &&
-            user?.email_verified_at
-        )
-            router.push(redirectIfAuthenticated)
-        
-        if (middleware === 'auth' && error) logout()
-    }, [user, error]);
-    
+        router.push('/login'); // Use router for navigation instead of window
+    };
+
     return {
-        user,
         register,
         login,
         forgotPassword,
         resetPassword,
         resendEmailVerification,
         logout,
-    }
-}
+        githubLogin
+    };
+};

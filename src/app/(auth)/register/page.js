@@ -9,10 +9,7 @@ import { useAuth } from '@/hooks/auth'
 import { useState } from 'react'
 
 const Page = () => {
-    const { register } = useAuth({
-        middleware: 'guest',
-        redirectIfAuthenticated: '/dashboard',
-    })
+    const { register } = useAuth()
 
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')

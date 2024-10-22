@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useAuth } from '@/hooks/auth'
 
 const LoginLinks = () => {
-    const { user } = useAuth({ middleware: 'guest' })
+    const { user } = useAuth()
 
     return (
         <div className="hidden fixed top-0 right-0 px-6 py-4 sm:block">

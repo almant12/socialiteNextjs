@@ -5,10 +5,7 @@ import { useAuth } from '@/hooks/auth'
 import { useState } from 'react'
 
 const Page = () => {
-    const { logout, resendEmailVerification } = useAuth({
-        middleware: 'auth',
-        redirectIfAuthenticated: '/dashboard',
-    })
+    const { logout, resendEmailVerification } = useAuth()
 
     const [status, setStatus] = useState(null)
 

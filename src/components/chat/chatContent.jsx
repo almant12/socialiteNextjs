@@ -1,8 +1,10 @@
 'use client'
-import React from 'react';
+import React, { useState } from 'react';
 import { Box, Grid, Paper, Divider, TextField, Button, Avatar } from '@mui/material';
 
-const ChatContent = () => {
+const ChatContent = ({userId}) => {
+
+    const [messages, setMessages] = useState([]);
 
     return (
         <Grid item xs={9} sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>

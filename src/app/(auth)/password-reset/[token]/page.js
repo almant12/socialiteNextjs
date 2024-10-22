@@ -12,7 +12,7 @@ import AuthSessionStatus from '@/app/(auth)/AuthSessionStatus'
 const PasswordReset = () => {
     const searchParams = useSearchParams()
 
-    const { resetPassword } = useAuth({ middleware: 'guest' })
+    const { resetPassword } = useAuth()
 
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')

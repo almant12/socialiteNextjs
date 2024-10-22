@@ -10,7 +10,6 @@ const ChatComponent = () => {
 
     // Function to update the userId from Sidebar
     const handleUserSelect = (id) => {
-        console.log(id)
         setUserId(id);
     };
     

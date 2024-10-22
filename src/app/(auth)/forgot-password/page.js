@@ -9,10 +9,7 @@ import { useState } from 'react'
 import AuthSessionStatus from '@/app/(auth)/AuthSessionStatus'
 
 const Page = () => {
-    const { forgotPassword } = useAuth({
-        middleware: 'guest',
-        redirectIfAuthenticated: '/dashboard',
-    })
+    const { forgotPassword } = useAuth()
 
     const [email, setEmail] = useState('')
     const [errors, setErrors] = useState([])

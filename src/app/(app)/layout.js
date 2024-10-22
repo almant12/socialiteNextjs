@@ -5,7 +5,7 @@ import Navigation from '@/app/(app)/Navigation'
 import Loading from '@/app/(app)/Loading'
 
 const AppLayout = ({ children }) => {
-    const { user } = useAuth({ middleware: 'auth' })
+    const { user } = useAuth()
 
     if (!user) {
         return <Loading />
