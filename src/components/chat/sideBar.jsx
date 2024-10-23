@@ -1,36 +1,20 @@
 
 'use client'
-import React, { useEffect, useState } from 'react';
 import { Box, Typography, TextField, Button, Avatar, CircularProgress } from '@mui/material';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
-import axios from 'axios';
+import { useEffect, useState } from 'react';
 
-const Sidebar = ({onUserSelect}) => {
-    const [users, setUsers] = useState([]);
-    const [error, setError] = useState(null);
+const Sidebar = ({users,onUserSelect}) => {
+
+    const [userss,setUser] = useState([]);
 
     const handleUserClick = (id) => {
         onUserSelect(id);
     };
 
-    useEffect(() => {
-        const fetchUsers = async () => {
-            try {
-                const response = await axios.get('http://localhost:8000/api/message', {
-                    headers: {
-                        Authorization: `Bearer 73|HS7ELdTZ3NYktdGz1d9nsWLMmJ8m2Mt2JJAS8crH615e8d2a`
-                    }
-                });
-                setUsers(response.data.map(item=>item.user));
-                
-            } catch (err) {
-                setError(err);
-            }
-        };
-
-        fetchUsers();
-    }, []);
-
+    useEffect(()=>{
+        setUser(users)
+    },[users])
 
     return (
         <Box sx={{ p: 2, backgroundColor: 'white', display: 'flex', flexDirection: 'column' }}>
@@ -50,7 +34,7 @@ const Sidebar = ({onUserSelect}) => {
             <Box sx={{ mt: 4, flexGrow: 1 }}>
                 <Typography variant="caption" sx={{ fontWeight: 'bold' }}>Active Conversations</Typography>
                 <Box sx={{ mt: 2, height: 150, overflowY: 'auto' }}>
-                    {users.map(user => (
+                    {userss.map(user => (
                         <Button 
                             key={user.id} // Assuming each user has a unique id
                             onClick={() => handleUserClick(user.id)} 

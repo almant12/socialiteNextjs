@@ -1,20 +1,20 @@
 import axios from '@/lib/axios';
 import { useParams, useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
-import { useState, useEffect } from 'react';
+import { useState,} from 'react';
+
+
 
 export const useAuth = () => {
     const router = useRouter();
     const params = useParams();
 
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState(() => {
+        const userCookie = Cookies.get('user');
+        return userCookie ? JSON.parse(userCookie) : null;
+    });
+    const [token, setToken] = useState(Cookies.get('token') || null);
 
-    useEffect(() => {
-        const storedUser = Cookies.get('user');
-        if (storedUser?.length > 10) {
-            setUser(JSON.parse(storedUser));
-        }
-    }, []);
 
     const csrf = () => axios.get('/sanctum/csrf-cookie');
 
@@ -123,16 +123,33 @@ export const useAuth = () => {
     };
 
     const logout = async () => {
-        await axios.post('/api/logout').then(() => {
+        try {
+            await axios.post('/api/logout', null, {
+                headers: {
+                    Authorization: 'Bearer ' + token,
+                },
+            });
+            
             Cookies.remove('user');
             Cookies.remove('token');
-        });
-
-        router.push('/login');
+            
+            router.push('/login');
+        } catch (error) {
+            if (error.response && error.response.status === 401) {
+                Cookies.remove('user');
+                Cookies.remove('token');
+                router.push('/login');
+            } else {
+                console.error('Logout failed:', error);
+            }
+        }
     };
+    
+    
 
     return {
         user,
+        token,
         register,
         login,
         forgotPassword,

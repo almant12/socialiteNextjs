@@ -22,7 +22,7 @@ const Callback = () => {
     }, [searchParams, githubCallback, router]);
 
     return (
-        <>
+        <div>
             {loading ? (
                 <div className="flex min-h-screen w-full items-center justify-center bg-gray-100">
                     Loading...
@@ -30,7 +30,7 @@ const Callback = () => {
             ) : (
                 error && <p>{error}</p>
             )}
-            </>
+            </div>
     );
 };
 
