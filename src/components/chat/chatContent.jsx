@@ -28,10 +28,10 @@ return (
                             <Grid item xs={8} key={message.id} sx={{ marginLeft: message.sender_id === currentUserId ? 'auto' : '0' }}>
                                 <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: message.sender_id === currentUserId ? 'row-reverse' : 'row' }}>
                                 <Avatar 
-                                        src={message.sender_profile.avatar} // Use the avatar image
-                                        alt={message.sender_profile.name} // Alt text for accessibility
-                                        sx={{ bgcolor: 'indigo.500' }} // Fallback color if avatar image is not available
-                                    />
+    src={message.sender_profile.avatar ? `http://localhost:8000/${message.sender_profile.avatar}` : 'https://via.placeholder.com/40'} // Use the avatar image or a placeholder
+    alt={message.sender_profile.name} // Alt text for accessibility
+    sx={{ bgcolor: 'indigo.500' }} // Fallback color if avatar image is not available
+/>
                                     <Paper 
                                         sx={{ 
                                             ml: message.sender_id === currentUserId ? '0' : 2, 
@@ -42,7 +42,7 @@ return (
                                             backgroundColor: message.sender_id === currentUserId ? 'indigo.100' : 'white'
                                         }}
                                     >
-                                        <strong>{message.sender_profile.name}:</strong> {message.message}
+                                    {message.message}
                                     </Paper>
                                 </Box>
                             </Grid>
