@@ -1,19 +1,17 @@
-
 import axios from '@/lib/axios';
 import { useParams, useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
-import { useState ,useEffect} from 'react';
+import { useState, useEffect } from 'react';
 
 export const useAuth = () => {
     const router = useRouter();
     const params = useParams();
 
-    const [user,setUser] = useState(null)
+    const [user, setUser] = useState(null);
 
     useEffect(() => {
         const storedUser = Cookies.get('user');
-        if (storedUser) {
-            console.log(storedUser)
+        if (storedUser?.length > 10) {
             setUser(JSON.parse(storedUser));
         }
     }, []);
@@ -27,7 +25,6 @@ export const useAuth = () => {
         axios
             .post('/api/register', props)
             .then(() => {
-                // Redirect to login page after successful registration
                 router.push('/login');
             })
             .catch(error => {
@@ -44,15 +41,13 @@ export const useAuth = () => {
         await axios
             .post('/api/login', props)
             .then((response) => {
-                console.log(response.data)
-                // Assuming the response contains user and token
                 const { user, token } = response.data;
-                setUser(user)
+                setUser(user);
 
-                Cookies.set('user', JSON.stringify(user), { expires: 7 }); // Save user in cookie
-                Cookies.set('token', token, { expires: 7 }); // Save token in cookie
+                Cookies.set('user', JSON.stringify(user), { expires: 7 });
+                Cookies.set('token', token, { expires: 7 });
 
-                router.push('/dashboard'); // Redirect to dashboard or any other route
+                router.push('/admin/dashboard');
             })
             .catch(error => {
                 if (error.response.status !== 422) throw error;
@@ -68,6 +63,29 @@ export const useAuth = () => {
         axios.get("/api/github").then((res) => {
             router.replace(res.data);
         });
+    };
+
+    const githubCallback = async (code, setErrors) => {
+        try {
+            const response = await axios.get(`/api/callback?code=${code}`);
+            if (response.data.token) {
+                // Assuming the response contains user and token
+                const { user, token } = response.data;
+                setUser(user);
+
+                Cookies.set('user', JSON.stringify(user), { expires: 7 });
+                Cookies.set('token', token, { expires: 7 });
+
+                router.push('/admin/dashboard');
+            } else {
+                setErrors("Authentication failed.");
+                router.push('/login');
+            }
+        } catch (err) {
+            console.error('Error during GitHub login:', err);
+            setErrors("An error occurred during authentication.");
+            router.push('/login');
+        }
     };
 
     const forgotPassword = async ({ setErrors, setStatus, email }) => {
@@ -91,9 +109,7 @@ export const useAuth = () => {
 
         axios
             .post('/api/reset-password', { token: params.token, ...props })
-            .then(response =>
-                router.push('/login?reset=' + btoa(response.data.status)),
-            )
+            .then(response => router.push('/login?reset=' + btoa(response.data.status)))
             .catch(error => {
                 if (error.response.status !== 422) throw error;
                 setErrors(error.response.data.errors);
@@ -108,11 +124,11 @@ export const useAuth = () => {
 
     const logout = async () => {
         await axios.post('/api/logout').then(() => {
-            Cookies.remove('user'); // Remove user from cookie
-            Cookies.remove('token'); // Remove token from cookie
+            Cookies.remove('user');
+            Cookies.remove('token');
         });
 
-        router.push('/login'); // Use router for navigation instead of window
+        router.push('/login');
     };
 
     return {
@@ -123,6 +139,7 @@ export const useAuth = () => {
         resetPassword,
         resendEmailVerification,
         logout,
-        githubLogin
+        githubLogin,
+        githubCallback
     };
 };

@@ -8,6 +8,4 @@ const axios = Axios.create({
     withCredentials: true,
 });
 
-console.log('Axios baseURL:', axios.defaults.baseURL); // Log the base URL to verify
-
 export default axios;
