@@ -11,6 +11,7 @@ import Cookies from 'js-cookie'; // Import js-cookie
 const ChatComponent = () => {
     const { token } = useAuth();
     const [users, setUsers] = useState([]);
+    const [messages,setMessage] = useState([]);
     const [userId, setUserId] = useState(null);
     const router = useRouter(); // Initialize the router
 
@@ -22,18 +23,15 @@ const ChatComponent = () => {
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                const response = await axios.get('/api/message', {
+                const response = await axios.get('/api/user-message', {
                     headers: {
                         Authorization: `Bearer ${token}`,
 
                     },
                 });
-                console.log(response.data);
-                // Handle successful response and set users if needed
-                setUsers(response.data.map(item=>item.user)); // Assuming response.data contains users
+                setUsers(response.data.map(item=>item.user));
             } catch (error) {
                 if (error.response && error.response.status === 401) {
-                    // Clear the user token using js-cookie
                     Cookies.remove('token'); // Remove the token cookie
                     Cookies.remove('user')
                     // Redirect to login page
@@ -46,6 +44,24 @@ const ChatComponent = () => {
         fetchUsers();
     }, [token, router]); // Add token and router to the dependency array
 
+    useEffect(()=>{
+        const fetchMessage = async()=>{
+        try{
+                const response = await axios.get('/api/message/'+userId,{
+                    headers:{
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                setMessage(response.data)
+        }catch(error){
+            console.error(error)
+        }
+    }
+    fetchMessage()
+    },[userId])
+
+
+
     return (
         <Box sx={{ py: 12 }}>
             <Box sx={{ maxWidth: '7xl', mx: 'auto', px: { sm: 6, lg: 8 } }}>
@@ -55,7 +71,7 @@ const ChatComponent = () => {
                             {/* Sidebar */}
                             <Sidebar users={users} onUserSelect={handleUserSelect} />
                             {/* Chat Content */}
-                            <ChatContent />
+                            <ChatContent messages={messages} />
                         </Grid>
                     </Box>
                 </Paper>

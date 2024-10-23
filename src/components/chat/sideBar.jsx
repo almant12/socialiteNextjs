@@ -6,15 +6,12 @@ import { useEffect, useState } from 'react';
 
 const Sidebar = ({users,onUserSelect}) => {
 
-    const [userss,setUser] = useState([]);
+
 
     const handleUserClick = (id) => {
         onUserSelect(id);
     };
 
-    useEffect(()=>{
-        setUser(users)
-    },[users])
 
     return (
         <Box sx={{ p: 2, backgroundColor: 'white', display: 'flex', flexDirection: 'column' }}>
@@ -34,7 +31,7 @@ const Sidebar = ({users,onUserSelect}) => {
             <Box sx={{ mt: 4, flexGrow: 1 }}>
                 <Typography variant="caption" sx={{ fontWeight: 'bold' }}>Active Conversations</Typography>
                 <Box sx={{ mt: 2, height: 150, overflowY: 'auto' }}>
-                    {userss.map(user => (
+                    {users.map(user => (
                         <Button 
                             key={user.id} // Assuming each user has a unique id
                             onClick={() => handleUserClick(user.id)} 
