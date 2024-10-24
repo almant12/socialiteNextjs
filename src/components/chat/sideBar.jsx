@@ -1,20 +1,21 @@
-
 'use client'
-import { Box, Typography, TextField, Button, Avatar, CircularProgress } from '@mui/material';
+import { Box, Typography, TextField, Button, Avatar } from '@mui/material';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import { useEffect, useState } from 'react';
 
-const Sidebar = ({users,onUserSelect}) => {
+const Sidebar = ({ users, onUserSelect }) => {
+    const [selectUser, setSelectUser] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
 
-
-    const [selectUser,setSelectUser] = useState(null);
-    
     const handleUserClick = (id) => {
         onUserSelect(id);
-        setSelectUser(id)
+        setSelectUser(id);
     };
 
-
+    // Filter users based on the search query
+    const filteredUsers = users.filter(user =>
+        user.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     return (
         <Box sx={{ p: 2, backgroundColor: 'white', display: 'flex', flexDirection: 'column' }}>
@@ -24,22 +25,24 @@ const Sidebar = ({users,onUserSelect}) => {
                 </Avatar>
                 <Typography variant="h6" sx={{ ml: 2, fontWeight: 'bold' }}>QuickChat</Typography>
             </Box>
-            <TextField 
-                fullWidth 
-                placeholder="Search..." 
-                variant="outlined" 
-                size="small" 
-                sx={{ mt: 2 }} 
+            <TextField
+                fullWidth
+                placeholder="Search..."
+                variant="outlined"
+                size="small"
+                sx={{ mt: 2 }}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)} // Update search query on input change
             />
             <Box sx={{ mt: 4, flexGrow: 1 }}>
                 <Typography variant="caption" sx={{ fontWeight: 'bold' }}>Active Conversations</Typography>
                 <Box sx={{ mt: 2, height: 150, overflowY: 'auto' }}>
-                    {users.map(user => ( 
-                        <Button 
+                    {filteredUsers.map(user => (
+                        <Button
                             key={user.id} // Assuming each user has a unique id
-                            onClick={() => handleUserClick(user.id)} 
-                            fullWidth 
-                            startIcon={<Avatar 
+                            onClick={() => handleUserClick(user.id)}
+                            fullWidth
+                            startIcon={<Avatar
                                 src={user.avatar ? `http://localhost:8000/${user.avatar}` : 'https://via.placeholder.com/40'} // Use the avatar image or a placeholder
                                 alt={user.name} // Alt text for accessibility
                                 sx={{ bgcolor: 'indigo.500' }} // Fallback color if avatar image is not available
