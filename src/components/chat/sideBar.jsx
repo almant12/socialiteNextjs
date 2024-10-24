@@ -7,9 +7,12 @@ import { useEffect, useState } from 'react';
 const Sidebar = ({users,onUserSelect}) => {
 
 
+    const [selectUser,setSelectUser] = useState(null);
+    
 
     const handleUserClick = (id) => {
         onUserSelect(id);
+        setSelectUser(id)
     };
 
 
@@ -31,13 +34,25 @@ const Sidebar = ({users,onUserSelect}) => {
             <Box sx={{ mt: 4, flexGrow: 1 }}>
                 <Typography variant="caption" sx={{ fontWeight: 'bold' }}>Active Conversations</Typography>
                 <Box sx={{ mt: 2, height: 150, overflowY: 'auto' }}>
-                    {users.map(user => (
+                    {users.map(user => ( 
                         <Button 
                             key={user.id} // Assuming each user has a unique id
                             onClick={() => handleUserClick(user.id)} 
                             fullWidth 
-                            startIcon={<Avatar sx={{ bgcolor: 'indigo.300' }}>{user.initial}</Avatar>} // Assuming you have user initials
-                            sx={{ justifyContent: 'flex-start', py: 1.5, textTransform: 'none' }}
+                            startIcon={<Avatar 
+                                src={user.avatar ? `http://localhost:8000/${user.avatar}` : 'https://via.placeholder.com/40'} // Use the avatar image or a placeholder
+                                alt={user.name} // Alt text for accessibility
+                                sx={{ bgcolor: 'indigo.500' }} // Fallback color if avatar image is not available
+                            />} // Assuming you have user initials
+                            sx={{
+                                justifyContent: 'flex-start',
+                                py: 1.5,
+                                textTransform: 'none',
+                                backgroundColor: selectUser === user.id ? 'lightgray' : 'transparent', // Highlight selected user
+                                '&:hover': {
+                                    backgroundColor: selectUser === user.id ? 'lightgray' : 'rgba(0, 0, 0, 0.08)', // Customize hover effect for selected user
+                                },
+                            }}
                         >
                             {user.name}
                         </Button>
