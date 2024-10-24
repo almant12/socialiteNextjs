@@ -9,11 +9,11 @@ const Sidebar = ({users,onUserSelect}) => {
 
     const [selectUser,setSelectUser] = useState(null);
     
-
     const handleUserClick = (id) => {
         onUserSelect(id);
         setSelectUser(id)
     };
+
 
 
     return (

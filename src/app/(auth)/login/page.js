@@ -35,17 +35,6 @@ const Login = () => {
         }
     })
 
-    useEffect(()=>{
-        if(code?.length > 0){
-            const githubAuthenticate = async ()=>{
-                setLoading(true)
-                const response = await axios.get('/api/callback?code='+code);
-                console.log(response)
-            }
-            githubAuthenticate()
-        }
-    },[code])
-
     const submitForm = async event => {
         event.preventDefault()
 
