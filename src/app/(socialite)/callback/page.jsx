@@ -19,7 +19,8 @@ const Callback = () => {
             setError("No code provided.");
             router.push('/login');
         }
-    }, [searchParams, githubCallback, router]);
+        githubCallback();
+    },[]);
 
     return (
         <div>
