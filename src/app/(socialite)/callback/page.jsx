@@ -10,9 +10,9 @@ const Callback = () => {
     const searchParams = useSearchParams();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const code = searchParams.get('code');
 
     useEffect(() => {
-        const code = searchParams.get('code');
         if (code) {
             githubCallback(code, setError).finally(() => setLoading(false));
         } else {
@@ -20,7 +20,7 @@ const Callback = () => {
             router.push('/login');
         }
         githubCallback();
-    },[]);
+    },[code]);
 
     return (
         <div>
