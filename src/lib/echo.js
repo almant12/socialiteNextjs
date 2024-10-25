@@ -1,8 +1,8 @@
 import Echo from 'laravel-echo';
-import axios from './axios'; // Import your configured Axios instance
+import axios from './axios';
 import Pusher from 'pusher-js';
 import { useEffect, useState } from 'react';
-import { useAuth } from './useAuth'; // Assuming this is your custom hook to get user authentication details
+import { useAuth } from '@/hooks/auth'; // Assuming this is your custom hook to get user authentication details
 
 window.Pusher = Pusher;
 

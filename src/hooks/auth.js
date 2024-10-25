@@ -23,7 +23,9 @@ export const useAuth = () => {
         setErrors([]);
 
         axios
-            .post('/api/register', props)
+            .post('/api/register', props,{
+                
+            })
             .then(() => {
                 router.push('/login');
             })
