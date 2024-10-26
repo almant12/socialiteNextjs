@@ -20,18 +20,21 @@ const Navigation = ({ user }) => {
 
 
     useEffect(() => {
-        // Here we are going to listen for real-time events.
         if (echo) {
-            console.log(user.id)
-            echo.private(`chat.${user?.id}`).listen('message-sent', event => {
-                if (event.receiver.id === user?.id)
-                    console.log('Real-time event received: ', event)
-
-                handleEchoCallback()
-            })
-        }
-        
-    }, [user,echo])
+            // Listen to the channel for new messages
+            echo.private(`chat.${user.id}`) // Replace 'chat' with your actual channel name
+                .listen('message-sent', (event) => { // Replace 'MessageSent' with the event name defined in Laravel
+                    console.log(event)
+                    setMessages((prevMessages) => [...prevMessages, event.message]);
+                });
+            }
+        // Cleanup on component unmount or when echo changes
+        return () => {
+            if (echo) {
+                echo.leaveChannel('chat'); // Replace 'chat' with your channel name
+            }
+        };
+    }, [echo]);
 
     return (
         <nav className="bg-white border-b border-gray-100">
