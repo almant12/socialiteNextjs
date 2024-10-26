@@ -1,19 +1,21 @@
-import Echo from 'laravel-echo';
-import axios from './axios';
-import Pusher from 'pusher-js';
 import { useEffect, useState } from 'react';
-import { useAuth } from '@/hooks/auth'; // Assuming this is your custom hook to get user authentication details
+import axios from './axios';
+import Echo from 'laravel-echo';
+import Pusher from 'pusher-js';
+import Cookies from 'js-cookie'; // Import the js-cookie library
 
-window.Pusher = Pusher;
+if (typeof window !== 'undefined') {
+  window.Pusher = Pusher;
+}
 
 const useEcho = () => {
   const [echoInstance, setEchoInstance] = useState(null);
-  const { token } = useAuth(); // Custom hook to get the current auth token
 
   useEffect(() => {
-    // Ensure the token is available before initializing Echo
-    if (!token) return;
+    // Get the Bearer token from cookies
+    const token = Cookies.get('token'); // Replace 'token' with the name of your cookie
 
+    // Create the Echo instance here
     const echo = new Echo({
       broadcaster: 'reverb',
       key: process.env.NEXT_PUBLIC_REVERB_APP_KEY,
@@ -29,7 +31,7 @@ const useEcho = () => {
                 },
                 {
                   headers: {
-                    Authorization: `Bearer ${token}`, // Add the Bearer token
+                    Authorization: `Bearer ${token}`, // Use the token from the cookie
                   },
                 }
               )
@@ -43,21 +45,21 @@ const useEcho = () => {
         };
       },
       wsHost: process.env.NEXT_PUBLIC_REVERB_HOST,
-      wsPort: process.env.NEXT_PUBLIC_REVERB_PORT ?? 80,
-      wssPort: process.env.NEXT_PUBLIC_REVERB_PORT ?? 443,
+      wsPort: process.env.NEXT_PUBLIC_REVERB_PORT,
+      wssPort: process.env.NEXT_PUBLIC_REVERB_PORT,
       forceTLS: (process.env.NEXT_PUBLIC_REVERB_SCHEME ?? 'https') === 'https',
       enabledTransports: ['ws', 'wss'],
     });
-
+    
     setEchoInstance(echo);
 
-    // Cleanup on component unmount
+    // Cleanup on unmount
     return () => {
       if (echo) {
-        echo.disconnect();
+        echo.disconnect(); // Optional: disconnect when the component unmounts
       }
     };
-  }, [token]); // Only re-run effect if the token changes
+  }, []); // No dependency on token; it fetches directly from the cookie
 
   return echoInstance;
 };

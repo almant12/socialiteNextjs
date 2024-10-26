@@ -1,7 +1,7 @@
 import axios from '@/lib/axios';
 import { useParams, useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
-import { useState,} from 'react';
+import { useState,useEffect} from 'react';
 
 
 
@@ -9,11 +9,26 @@ export const useAuth = () => {
     const router = useRouter();
     const params = useParams();
 
-    const [user, setUser] = useState(() => {
+    const [user, setUser] = useState(null);
+    const [token, setToken] = useState(null);
+
+    // Use effect to set user and token from cookies
+    useEffect(() => {
         const userCookie = Cookies.get('user');
-        return userCookie ? JSON.parse(userCookie) : null;
-    });
-    const [token, setToken] = useState(Cookies.get('token') || null);
+        const tokenCookie = Cookies.get('token');
+
+        if (userCookie) {
+            setUser(JSON.parse(userCookie));
+        } else {
+            setUser(null);
+        }
+
+        if (tokenCookie) {
+            setToken(tokenCookie);
+        } else {
+            setToken(null);
+        }
+    }, []); // Empty dependency array means this runs once on mount
 
 
     const csrf = () => axios.get('/sanctum/csrf-cookie');

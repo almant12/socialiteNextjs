@@ -1,37 +1,41 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow, set } from 'date-fns';
 import { Box, Grid, Paper, Typography, Divider, TextField, Button, Avatar } from '@mui/material';
 import { useAuth } from '@/hooks/auth';
-import useEcho from '@/lib/echo'; // Import the custom Echo hook
+import useEcho from '@/lib/echo'
 import axios from '@/lib/axios'; // Import your configured Axios instance
 
-const ChatContent = ({ messages: initialMessages }) => {
+const ChatContent = ({ messages }) => {
     const { user } = useAuth();
-    const currentUserId = user.id;
 
-    const [messages, setMessages] = useState(initialMessages);
+    const [messagess, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
+    const [currentUserId,setCurrentUserId] = useState(user?.id);
     const echo = useEcho(); // Initialize Echo
 
-    useEffect(() => {
-        if (echo) {
-            // Listen to the channel for new messages
-            echo.private(`chat.${user.id}`) // Replace 'chat' with your actual channel name
-                .listen('message-sent', (event) => { // Replace 'MessageSent' with the event name defined in Laravel
-                    console.log(event)
-                    setMessages((prevMessages) => [...prevMessages, event.message]);
-                });
-        }
+    useEffect(()=>{
+        setMessages(messages)
+        setCurrentUserId(user?.id)
+    })
+    // useEffect(() => {
+    //     if (echo) {
+    //         // Listen to the channel for new messages
+    //         echo.private(`chat.${user.id}`) // Replace 'chat' with your actual channel name
+    //             .listen('message-sent', (event) => { // Replace 'MessageSent' with the event name defined in Laravel
+    //                 console.log(event)
+    //                 setMessages((prevMessages) => [...prevMessages, event.message]);
+    //             });
+    //     }
 
-        // Cleanup on component unmount or when echo changes
-        return () => {
-            if (echo) {
-                echo.leaveChannel('chat'); // Replace 'chat' with your channel name
-            }
-        };
-    }, [echo]);
+    //     // Cleanup on component unmount or when echo changes
+    //     return () => {
+    //         if (echo) {
+    //             echo.leaveChannel('chat'); // Replace 'chat' with your channel name
+    //         }
+    //     };
+    // }, [echo]);
 
     const timeAgo = (timestamp) => {
         return formatDistanceToNow(new Date(timestamp), { addSuffix: true });
@@ -56,7 +60,7 @@ const ChatContent = ({ messages: initialMessages }) => {
 
     return (
         <Grid item xs={9} sx={{ p: 0, display: 'flex', flexDirection: 'column' }}>
-            {messages && messages.length > 0 ? (
+            {messagess && messagess.length > 0 ? (
                 <Box
                     sx={{
                         flexGrow: 1,
@@ -67,9 +71,15 @@ const ChatContent = ({ messages: initialMessages }) => {
                         flexDirection: 'column',
                     }}
                 >
-                    <Box sx={{ flexGrow: 1, overflowY: 'auto' }}>
+                    <Box
+                        sx={{
+                            flexGrow: 1,
+                            overflowY: 'auto',
+                            maxHeight: '500px', // Set a max height for scrolling
+                        }}
+                    >
                         <Grid container spacing={2}>
-                            {messages.map((message) => (
+                            {messagess.map((message) => (
                                 <Grid item xs={8} key={message.id} sx={{ marginLeft: message.sender_id === currentUserId ? 'auto' : '0' }}>
                                     <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: message.sender_id === currentUserId ? 'row-reverse' : 'row' }}>
                                         <Avatar
@@ -135,6 +145,7 @@ const ChatContent = ({ messages: initialMessages }) => {
             )}
         </Grid>
     );
-};
+}
+    
 
 export default ChatContent;

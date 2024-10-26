@@ -8,12 +8,30 @@ import ResponsiveNavLink, {
 import { DropdownButton } from '@/components/DropdownLink'
 import { useAuth } from '@/hooks/auth'
 import { usePathname } from 'next/navigation'
-import { useState } from 'react'
+import { useState,useEffect } from 'react'
+import useEcho from '@/lib/echo'
+
 
 const Navigation = ({ user }) => {
-    const { logout } = useAuth()
 
-    const [open, setOpen] = useState(false)
+    const { logout} = useAuth();
+    const [open, setOpen] = useState(false);
+    const echo = useEcho();
+
+
+    useEffect(() => {
+        // Here we are going to listen for real-time events.
+        if (echo) {
+            console.log(user.id)
+            echo.private(`chat.${user?.id}`).listen('message-sent', event => {
+                if (event.receiver.id === user?.id)
+                    console.log('Real-time event received: ', event)
+
+                handleEchoCallback()
+            })
+        }
+        
+    }, [user,echo])
 
     return (
         <nav className="bg-white border-b border-gray-100">
