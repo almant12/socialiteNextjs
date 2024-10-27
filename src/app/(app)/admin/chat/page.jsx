@@ -63,7 +63,7 @@ const ChatComponent = () => {
 
 
     return (
-        <Box sx={{ py: 12}}>
+        <Box sx={{ py: 1}}>
             <Box sx={{ maxWidth: '7xl', mx: 'auto', px: { sm: 6, lg: 8 } }}>
                 <Paper elevation={3} sx={{ overflow: 'hidden', borderRadius: 2 }}>
                     <Box sx={{ p: 3, backgroundColor: 'white', borderBottom: 1, borderColor: 'grey.200' }}>
@@ -71,7 +71,7 @@ const ChatComponent = () => {
                             {/* Sidebar */}
                             <Sidebar users={users} onUserSelect={handleUserSelect} />
                             {/* Chat Content */}
-                            <ChatContent messages={messages} />
+                            <ChatContent messages={messages} receiverId={userId}/>
                         </Grid>
                     </Box>
                 </Paper>

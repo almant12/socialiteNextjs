@@ -9,26 +9,27 @@ export const useAuth = () => {
     const router = useRouter();
     const params = useParams();
 
-    const [user, setUser] = useState(null);
-    const [token, setToken] = useState(null);
+   
+    const [user, setUser] = useState(() => getUserFromCookies());
+    const [token, setToken] = useState(() => getTokenFromCookies());
 
-    // Use effect to set user and token from cookies
-    useEffect(() => {
+    function getUserFromCookies() {
         const userCookie = Cookies.get('user');
-        const tokenCookie = Cookies.get('token');
+        return userCookie ? JSON.parse(userCookie) : null;
+    }
 
-        if (userCookie) {
-            setUser(JSON.parse(userCookie));
-        } else {
-            setUser(null);
-        }
+    function getTokenFromCookies() {
+        return Cookies.get('token') || null;
+    }
 
-        if (tokenCookie) {
-            setToken(tokenCookie);
-        } else {
-            setToken(null);
-        }
-    }, []); // Empty dependency array means this runs once on mount
+    // Use effect to set user and token from cookies on initial load
+    useEffect(() => {
+        const userFromCookie = getUserFromCookies();
+        const tokenFromCookie = getTokenFromCookies();
+        
+        setUser(userFromCookie);
+        setToken(tokenFromCookie);
+    }, []); // Run once on mount
 
 
     const csrf = () => axios.get('/sanctum/csrf-cookie');

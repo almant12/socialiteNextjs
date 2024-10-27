@@ -4,16 +4,13 @@ import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
 import Cookies from 'js-cookie'; // Import the js-cookie library
 
-if (typeof window !== 'undefined') {
-  window.Pusher = Pusher;
-}
 
 const useEcho = () => {
   const [echoInstance, setEchoInstance] = useState(null);
 
   useEffect(() => {
     // Get the Bearer token from cookies
-    const token = Cookies.get('token'); // Replace 'token' with the name of your cookie
+    const token = Cookies.get('token');
 
     // Create the Echo instance here
     const echo = new Echo({
@@ -31,7 +28,7 @@ const useEcho = () => {
                 },
                 {
                   headers: {
-                    Authorization: `Bearer ${token}`, // Use the token from the cookie
+                    Authorization: `Bearer ${token}`,
                   },
                 }
               )
@@ -52,14 +49,7 @@ const useEcho = () => {
     });
     
     setEchoInstance(echo);
-
-    // Cleanup on unmount
-    return () => {
-      if (echo) {
-        echo.disconnect(); // Optional: disconnect when the component unmounts
-      }
-    };
-  }, []); // No dependency on token; it fetches directly from the cookie
+  }, []);
 
   return echoInstance;
 };

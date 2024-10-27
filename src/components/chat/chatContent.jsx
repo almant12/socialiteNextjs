@@ -7,13 +7,11 @@ import { useAuth } from '@/hooks/auth';
 import useEcho from '@/lib/echo'; // Import the custom Echo hook
 import axios from '@/lib/axios'; // Import your configured Axios instance
 
-const ChatContent = ({ messages: initialMessages }) => {
+const ChatContent = ({ messages,receiverId}) => {
     const { user } = useAuth();
     const currentUserId = user.id;
 
-    const [messages, setMessages] = useState(initialMessages);
     const [newMessage, setNewMessage] = useState('');
-    const echo = useEcho(); // Initialize Echo
 
 
     const timeAgo = (timestamp) => {
@@ -24,9 +22,8 @@ const ChatContent = ({ messages: initialMessages }) => {
         if (!newMessage.trim()) return; // Don't send empty messages
 
         try {
-            const response = await axios.post('/api/messages', {
+            const response = await axios.post(`/api/message/${receiverId}`, {
                 message: newMessage,
-                sender_id: currentUserId,
             });
 
             const createdMessage = response.data;
@@ -38,7 +35,7 @@ const ChatContent = ({ messages: initialMessages }) => {
     };
 
     return (
-        <Grid item xs={9} sx={{ p: 0, display: 'flex', flexDirection: 'column' }}>
+        <Grid item xs={9} sx={{display: 'flex', flexDirection: 'column', height: '500px' }}>
             {messages && messages.length > 0 ? (
                 <Box
                     sx={{
@@ -48,10 +45,11 @@ const ChatContent = ({ messages: initialMessages }) => {
                         p: 2,
                         display: 'flex',
                         flexDirection: 'column',
+                        height: '100%',
                     }}
                 >
-                    <Box sx={{ flexGrow: 1, overflowY: 'auto' }}>
-                        <Grid container spacing={2}>
+                    <Box sx={{ flexGrow: 1, overflowY: 'auto', maxHeight: '70vh' }}>
+                        <Grid container spacing={2} sx={{ flexDirection: 'column-reverse' }}>
                             {messages.map((message) => (
                                 <Grid item xs={8} key={message.id} sx={{ marginLeft: message.sender_id === currentUserId ? 'auto' : '0' }}>
                                     <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: message.sender_id === currentUserId ? 'row-reverse' : 'row' }}>
@@ -118,6 +116,7 @@ const ChatContent = ({ messages: initialMessages }) => {
             )}
         </Grid>
     );
+    
 };
 
 export default ChatContent;
