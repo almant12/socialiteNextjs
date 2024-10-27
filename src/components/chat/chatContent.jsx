@@ -2,10 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { formatDistanceToNow } from 'date-fns';
-import { Box, Grid, Paper, Typography, Divider, TextField, Button, Avatar } from '@mui/material';
+import { Box, Grid, Paper, Typography, Divider, TextField,Avatar } from '@mui/material';
 import { useAuth } from '@/hooks/auth';
-import useEcho from '@/lib/echo'; // Import the custom Echo hook
-import axios from '@/lib/axios'; // Import your configured Axios instance
+import SendButton from './sendButton';
 
 const ChatContent = ({ messages,receiverId}) => {
     const { user } = useAuth();
@@ -16,22 +15,6 @@ const ChatContent = ({ messages,receiverId}) => {
 
     const timeAgo = (timestamp) => {
         return formatDistanceToNow(new Date(timestamp), { addSuffix: true });
-    };
-
-    const handleSendMessage = async () => {
-        if (!newMessage.trim()) return; // Don't send empty messages
-
-        try {
-            const response = await axios.post(`/api/message/${receiverId}`, {
-                message: newMessage,
-            });
-
-            const createdMessage = response.data;
-            setMessages((prevMessages) => [...prevMessages, createdMessage]);
-            setNewMessage(''); // Clear input field
-        } catch (error) {
-            console.error('Failed to send message:', error);
-        }
     };
 
     return (
@@ -88,14 +71,9 @@ const ChatContent = ({ messages,receiverId}) => {
                             value={newMessage}
                             onChange={(e) => setNewMessage(e.target.value)}
                         />
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            sx={{ ml: 2, px: 4 }}
-                            onClick={handleSendMessage}
-                        >
-                            Send
-                        </Button>
+
+                        <SendButton receiverId={receiverId} messageContent={newMessage}/>
+
                     </Box>
                 </Box>
             ) : (
