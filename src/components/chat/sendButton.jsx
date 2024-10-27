@@ -1,14 +1,13 @@
 import {Button } from '@mui/material';
+import axios from '@/lib/axios';
 
 const SendButton = ({receiverId,messageContent})=>{
 
     
     const handleSendMessage = async () => {
-        if (!newMessage.trim()) return; // Don't send empty messages
-
         try {
             const response = await axios.post(`/api/message/${receiverId}`, {
-                message: newMessage,
+                message: messageContent,
             });
 
             const createdMessage = response.data;
