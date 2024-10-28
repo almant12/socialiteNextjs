@@ -23,7 +23,7 @@ const Navigation = ({ user }) => {
         if (echo) {
             // Listen to the channel for new messages
             echo.private(`chat.${user.id}`)
-                .listen('message-sent', (event) => {
+                .listen('.message-sent', (event) => {
                     console.log(event)
                 });
             }

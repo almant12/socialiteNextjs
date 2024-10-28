@@ -6,10 +6,10 @@ const adminRoutes = ['/admin'];
 export async function middleware(req: NextRequest) {
     const { pathname } = req.nextUrl;
 
+
     // Guest route token validation
     if (pathname.startsWith('/login')) {
         const token = req.cookies.get('token');
-        
         if (token) {
             return NextResponse.redirect(new URL('/admin/dashboard', req.url));
         }
@@ -18,13 +18,13 @@ export async function middleware(req: NextRequest) {
     // Admin route token validation
     if (pathname.startsWith('/admin')) {
         const token = req.cookies.get('token');
-        
+
         if (!token) {
             return NextResponse.redirect(new URL('/login', req.url));
         }
 
     }
-
     // Allow the request to proceed
     return NextResponse.next();
 }
+

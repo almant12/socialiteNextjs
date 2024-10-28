@@ -1,7 +1,7 @@
 import {Button } from '@mui/material';
 import axios from '@/lib/axios';
 
-const SendButton = ({receiverId,messageContent})=>{
+const SendButton = ({receiverId,messageContent,addMessageToChat,setNewMessage})=>{
 
     
     const handleSendMessage = async () => {
@@ -11,7 +11,7 @@ const SendButton = ({receiverId,messageContent})=>{
             });
 
             const createdMessage = response.data;
-            setMessages((prevMessages) => [...prevMessages, createdMessage]);
+            addMessageToChat(createdMessage)
             setNewMessage(''); // Clear input field
         } catch (error) {
             console.error('Failed to send message:', error);

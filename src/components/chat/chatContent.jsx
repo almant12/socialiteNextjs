@@ -2,24 +2,35 @@
 
 import React, { useState, useEffect } from 'react';
 import { formatDistanceToNow } from 'date-fns';
-import { Box, Grid, Paper, Typography, Divider, TextField,Avatar } from '@mui/material';
+import { Box, Grid, Paper, Typography, Divider, TextField, Avatar } from '@mui/material';
 import { useAuth } from '@/hooks/auth';
 import SendButton from './sendButton';
 
-const ChatContent = ({ messages,receiverId}) => {
+const ChatContent = ({ messages, receiverId }) => {
     const { user } = useAuth();
     const currentUserId = user.id;
 
+    const [chatMessages, setChatMessages] = useState(messages);
     const [newMessage, setNewMessage] = useState('');
-
 
     const timeAgo = (timestamp) => {
         return formatDistanceToNow(new Date(timestamp), { addSuffix: true });
     };
 
+    const addNewMessage = (message) => {
+        setChatMessages((prevMessages) => [...prevMessages, message]);
+    };
+
+    // Sync the local messages state with the messages prop
+    useEffect(() => {
+        setChatMessages(messages);
+    }, [messages]);
+
+ 
+
     return (
-        <Grid item xs={9} sx={{display: 'flex', flexDirection: 'column', height: '500px' }}>
-            {messages && messages.length > 0 ? (
+        <Grid item xs={9} sx={{ display: 'flex', flexDirection: 'column', height: '500px' }}>
+            {chatMessages && chatMessages.length > 0 ? (
                 <Box
                     sx={{
                         flexGrow: 1,
@@ -33,7 +44,7 @@ const ChatContent = ({ messages,receiverId}) => {
                 >
                     <Box sx={{ flexGrow: 1, overflowY: 'auto', maxHeight: '70vh' }}>
                         <Grid container spacing={2} sx={{ flexDirection: 'column-reverse' }}>
-                            {messages.map((message) => (
+                            {chatMessages.map((message) => (
                                 <Grid item xs={8} key={message.id} sx={{ marginLeft: message.sender_id === currentUserId ? 'auto' : '0' }}>
                                     <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: message.sender_id === currentUserId ? 'row-reverse' : 'row' }}>
                                         <Avatar
@@ -72,8 +83,12 @@ const ChatContent = ({ messages,receiverId}) => {
                             onChange={(e) => setNewMessage(e.target.value)}
                         />
 
-                        <SendButton receiverId={receiverId} messageContent={newMessage}/>
-
+                        <SendButton 
+                            receiverId={receiverId}
+                            messageContent={newMessage}
+                            addMessageToChat={addNewMessage}
+                            setNewMessage={setNewMessage}
+                        />
                     </Box>
                 </Box>
             ) : (
@@ -94,7 +109,6 @@ const ChatContent = ({ messages,receiverId}) => {
             )}
         </Grid>
     );
-    
 };
 
 export default ChatContent;
